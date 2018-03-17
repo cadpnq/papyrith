@@ -4,6 +4,8 @@
 ;;; or an Activator will both be an object, but how do we distinguish between
 ;;; them in parameter lists?
 
+(defconstant +label+ '(label))
+
 (defconstant +integer-variable+ '(integer-variable))
 (defconstant +integer-literal+ '(integer-literal))
 (defconstant +integer-any+ (append +integer-variable+ +integer-literal+))

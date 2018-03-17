@@ -1,10 +1,26 @@
 ;;;; Define the instructions of the papyrus VM
 
-(defmacro def-instruction (name asm &rest arguments) )
-(defmacro def-instructions (names &rest arguments) )
+(defmacro def-instruction (name asm &rest arguments)
+  `(defstruct (,name
+     (:include instruction
+               (op ',name)
+               (asm ',asm)
+               ,@(loop for (arg type) in arguments
+                       collect `(,(symb arg "-TYPE") ,type)))
+     (:constructor ,name ,(mapcar #'car arguments))
+     (:print-function
+       (lambda (p s k)
+         (format s "~A " (instruction-asm p))
+         ,@(mapcar
+            #`(format s "~A " (slot-value p ',(car a1)))
+            arguments))))))
+
+(defmacro def-instructions (names &rest arguments)
+  `(progn ,@(loop for (name asm) in names
+                  collect `(def-instruction ,name ,asm ,@arguments))))
 
 (defstruct instruction
-  op asm
+  op asm target name
   dest dest-type
   arg1 arg1-type
   arg2 arg2-type
@@ -17,21 +33,21 @@
 ;;; argument type. The type checker code will need these to generate the
 ;;; appropriate casting for us.
 
-(defstruct (integer-add
-  (:include instruction
-            (op 'integer-add)
-            (asm 'iadd)
-            (dest-type +integer-variable+)
-            (arg1-type +integer-any+)
-            (arg2-type +integer-any+))
-  (:constructor integer-add (dest arg1 arg2))
-  (:print-function
-    (lambda (p s k)
-      (format s "~A " (instruction-asm p))
-      (format s "~A, ~A, ~A"
-              (instruction-dest p)
-              (instruction-arg1 p)
-              (instruction-arg2 p))))))
+; (defstruct (integer-add
+;   (:include instruction
+;             (op 'integer-add)
+;             (asm 'iadd)
+;             (dest-type +integer-variable+)
+;             (arg1-type +integer-any+)
+;             (arg2-type +integer-any+))
+;   (:constructor integer-add (dest arg1 arg2))
+;   (:print-function
+;     (lambda (p s k)
+;       (format s "~A " (instruction-asm p))
+;       (format s "~A, ~A, ~A"
+;               (instruction-dest p)
+;               (instruction-arg1 p)
+;               (instruction-arg2 p))))))
 
 (def-instructions
   ((integer-add iadd)
@@ -64,16 +80,18 @@
   (dest +bool-variable+)
   (arg1 +any-any+))
 
+(def-instructions
+  ((jump-t jmpt)
+   (jump-f jmpf))
+  (target +label+)
+  (arg1 +bool-any+))
 
-;
-; (def-instructions (jump-t jump-f)
-;   target condition)
-;
-; (def-instruction jump
-;   target)
-;
-; (def-instruction ret
-;   value)
+(def-instruction jump jmp
+  (target +label+))
+
+(def-instruction ret ret
+  (arg1 +any-any+))
+
 ;
 ; (def-instructions (cmp-eq cmp-lt cmp-lte cmp-gt cmp-gte)
 ;   dest arg1 arg2)
