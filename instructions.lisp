@@ -10,10 +10,11 @@
      (:constructor ,name ,(mapcar #'car arguments))
      (:print-function
        (lambda (p s k)
-         (format s "~A " (instruction-asm p))
-         ,@(mapcar
-            #`(format s "~A " (slot-value p ',(car a1)))
-            arguments))))))
+         (format s "~A ~{~A~^, ~}~%"
+           (instruction-asm p)
+           (mapcar
+            #'(lambda (a) (slot-value p (car a)))
+            ',arguments)))))))
 
 (defmacro def-instructions (names &rest arguments)
   `(progn ,@(loop for (name asm) in names
