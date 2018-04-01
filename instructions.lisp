@@ -10,7 +10,7 @@
      (:constructor ,name ,(mapcar #'car arguments))
      (:print-function
        (lambda (p s k)
-         (format s "~A ~{~A~^, ~}~%"
+         (format s "~A ~{~A ~}~%"
            (instruction-asm p)
            (mapcar
             #'(lambda (a) (slot-value p (car a)))
