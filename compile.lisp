@@ -56,6 +56,16 @@
                          (let ((compiler ',compiler))
                            (compile-expression `(,compiler ,arg1 ,arg2) dest))))))))
 
+(defmacro def-math-compiler (name)
+ (let ((integer-name (symb 'integer- name))
+        (float-name (symb 'float- name)))
+   `(progn
+     (def-binary-compiler ,integer-name :integer :integer :integer ,integer-name)
+     (def-binary-compiler ,float-name :float :float :float ,float-name)
+     (def-dispatching-compiler ,name
+       (:float ,float-name)
+       (:integer ,integer-name)))))
+
 (defun compile-expressions (code)
   (mapcar #'compile-expression code))
 
@@ -95,6 +105,12 @@
   (:string s+)
   (:float f+)
   (:integer i+))
+
+(def-math-compiler sub)
+(def-math-compiler mul)
+(def-math-compiler div)
+
+(def-binary-compiler integer-mod :integer :integer :integer integer-mod)
 
 (def-compiler assign (dest arg1)
   (let ((value (compile-expression arg1 dest)))
