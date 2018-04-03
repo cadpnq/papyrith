@@ -30,6 +30,14 @@
   arg5 arg5-type
   parameters)
 
+(defstruct (label
+  (:include instruction
+            (op 'label))
+  (:constructor label (name))
+  (:print-function
+    (lambda (p s k)
+      (format s "~A:" (instruction-name p))))))
+
 ;;; def-instruction should expand into something like this. Note the slots for
 ;;; argument type. The type checker code will need these to generate the
 ;;; appropriate casting for us.
@@ -77,15 +85,15 @@
   (dest +float-variable+)
   (arg1 +float-any+))
 
-(def-instruction not not
-  (dest +bool-variable+)
-  (arg1 +any-any+))
+; (def-instruction not not
+;   (dest +bool-variable+)
+;   (arg1 +any-any+))
 
 (def-instructions
   ((jump-t jmpt)
    (jump-f jmpf))
-  (target +label+)
-  (arg1 +bool-any+))
+  (arg1 +bool-any+)
+  (target +label+))
 
 (def-instruction jump jmp
   (target +label+))
@@ -93,10 +101,23 @@
 (def-instruction ret ret
   (arg1 +any-any+))
 
+(def-instruction assign assign
+  (dest +any-variable+)
+  (arg1 +any-any+))
+
+(def-instruction cast-as cast
+  (dest +any-variable+)
+  (arg1 +any-any+))
+
+(def-instruction string-cat strcat
+  (dest +string-variable+)
+  (arg1 +string-any+)
+  (arg2 +string-any+))
+
 ;
 ; (def-instructions (cmp-eq cmp-lt cmp-lte cmp-gt cmp-gte)
 ;   dest arg1 arg2)
-;
-; (def-instructions (assign cast)
-;   dest
-;   arg1)
+;;
+;  (def-instructions (assign cast-as)
+;    dest
+;    arg1)
