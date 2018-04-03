@@ -46,15 +46,15 @@
     dest))
 
 (defmacro def-dispatching-compiler (name &rest ops)
-  `(def-compiler ,name (arg1 arg2 &optional dest)
-    (let* ((arg1 (compile-expression arg1 dest))
-           (arg2 (compile-expression arg2 dest))
+  `(def-operator-compiler ,name (arg1 arg2 &optional dest)
+    (let* ((arg1 (compile-expression arg1))
+           (arg2 (compile-expression arg2))
            (types (list (typeof arg1) (typeof arg2))))
      (cond
        ,@(loop for (type compiler) in ops
                collect `((member ,type types)
                          (let ((compiler ',compiler))
-                           (compile-expression `(,compiler ,arg1 ,arg2 ,dest) dest))))))))
+                           (compile-expression `(,compiler ,arg1 ,arg2) dest))))))))
 
 (defun compile-expressions (code)
   (mapcar #'compile-expression code))
