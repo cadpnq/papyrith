@@ -11,6 +11,11 @@
         do (when (instruction-p instruction)
              (setq *bytecode* (append *bytecode* `(,instruction))))))
 
+(defmacro bytecode-append* (&rest instructions)
+  `(progn
+    ,@(loop for instruction in instructions
+            collect `(bytecode-append ,instruction))))
+
 (defun compile-papyrus (code)
   (let ((*bytecode* '(())))
     (compile-expressions code)
@@ -122,9 +127,8 @@
   (let ((exit-label (new-label)))
     (loop for (antecedent . consequent) in clauses
           do (let ((clause-exit (new-label)))
-               (bytecode-append
-                 (jump-f (compile-expression antecedent) clause-exit))
-               (bytecode-append
+               (bytecode-append*
+                 (jump-f (compile-expression antecedent) clause-exit)
                  (compile-expressions consequent)
                  (jump exit-label)
                  clause-exit)))
@@ -147,11 +151,9 @@
 (def-compiler while (condition &rest body)
   (let ((*break-label* (new-label))
         (*continue-label* (new-label)))
-    (bytecode-append
-      *continue-label*)
-    (bytecode-append
-      (jump-f (compile-expression condition) *break-label*))
-    (bytecode-append
+    (bytecode-append*
+      *continue-label*
+      (jump-f (compile-expression condition) *break-label*)
       (compile-expressions body)
       (jump *continue-label*)
       *break-label*)))
@@ -160,17 +162,13 @@
   (let ((*break-label* (new-label))
         (*continue-label* (new-label))
         (entry-label (new-label)))
-    (bytecode-append
-      (compile-expression initializer))
-    (bytecode-append
+    (bytecode-append*
+      (compile-expression initializer)
       (jump entry-label)
-      *continue-label*)
-    (bytecode-append
+      *continue-label*
       (compile-expression step)
-      entry-label)
-    (bytecode-append
-      (jump-f (compile-expression condition) *break-label*))
-    (bytecode-append
+      entry-label
+      (jump-f (compile-expression condition) *break-label*)
       (compile-expressions body)
       (jump *continue-label*)
       *break-label*)))
