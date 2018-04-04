@@ -132,6 +132,18 @@
 
 (defvar *break-label*)
 (defvar *continue-label*)
+(def-compiler break ()
+  (if *break-label*
+    (bytecode-append (jump *break-label*))
+    ; should signal an error here
+    ))
+
+(def-compiler continue ()
+  (if *continue-label*
+    (bytecode-append (jump *continue-label*))
+    ; should signal an error here
+    ))
+
 (def-compiler while (condition &rest body)
   (let ((*break-label* (new-label))
         (*continue-label* (new-label)))
