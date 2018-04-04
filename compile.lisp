@@ -155,3 +155,22 @@
       (compile-expressions body)
       (jump *continue-label*)
       *break-label*)))
+
+(def-compiler for (initializer condition step &rest body)
+  (let ((*break-label* (new-label))
+        (*continue-label* (new-label))
+        (entry-label (new-label)))
+    (bytecode-append
+      (compile-expression initializer))
+    (bytecode-append
+      (jump entry-label)
+      *continue-label*)
+    (bytecode-append
+      (compile-expression step)
+      entry-label)
+    (bytecode-append
+      (jump-f (compile-expression condition) *break-label*))
+    (bytecode-append
+      (compile-expressions body)
+      (jump *continue-label*)
+      *break-label*)))
