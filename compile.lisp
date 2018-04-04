@@ -117,3 +117,15 @@
     (unless (eq value dest)
       (bytecode-append (assign dest value))))
   dest)
+
+(def-compiler if (&rest clauses)
+  (let ((exit-label (new-label)))
+    (loop for (antecedent . consequent) in clauses
+          do (let ((clause-exit (new-label)))
+               (bytecode-append
+                 (jump-f (compile-expression antecedent) clause-exit))
+               (bytecode-append
+                 (compile-expressions consequent)
+                 (jump exit-label)
+                 clause-exit)))
+    (bytecode-append exit-label)))
