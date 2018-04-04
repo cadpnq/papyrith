@@ -129,3 +129,17 @@
                  (jump exit-label)
                  clause-exit)))
     (bytecode-append exit-label)))
+
+(defvar *break-label*)
+(defvar *continue-label*)
+(def-compiler while (condition &rest body)
+  (let ((*break-label* (new-label))
+        (*continue-label* (new-label)))
+    (bytecode-append
+      *continue-label*)
+    (bytecode-append
+      (jump-f (compile-expression condition) *break-label*))
+    (bytecode-append
+      (compile-expressions body)
+      (jump *continue-label*)
+      *break-label*)))
