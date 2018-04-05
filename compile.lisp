@@ -77,6 +77,16 @@
        (:float ,float-name)
        (:integer ,integer-name)))))
 
+(defmacro def-comparison-compiler (name)
+  (let ((integer-name (symb 'integer- name))
+        (float-name (symb 'float- name)))
+    `(progn
+      (def-binary-compiler ,integer-name :integer :integer :bool ,name)
+      (def-binary-compiler ,float-name :float :float :bool ,name)
+      (def-dispatching-compiler ,name
+        (:float ,float-name)
+        (:integer ,integer-name)))))
+
 (defun compile-expressions (code)
   (mapcar #'compile-expression code))
 
@@ -178,3 +188,8 @@
       (compile-expressions body)
       (jump *continue-label*)
       *break-label*)))
+
+(def-comparison-compiler compare-lt)
+(def-comparison-compiler compare-lte)
+(def-comparison-compiler compare-gt)
+(def-comparison-compiler compare-gte)
