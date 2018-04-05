@@ -21,9 +21,15 @@
     (compile-expressions code)
     (cdr *bytecode*)))
 
-(defvar *compilers* (make-hash-table))
+(let ((compilers (make-hash-table)))
+  (defun put-compiler (name compiler)
+    (setf (gethash name compilers) compiler))
+
+  (defun get-compiler (name)
+    (gethash name compilers)))
+
 (defmacro def-compiler (name args &rest body)
-  `(setf (gethash ',name *compilers*)
+  `(put-compiler ',name
     (lambda ,args
       ,@body)))
 
@@ -87,7 +93,7 @@
         (when (and (member compiler *operators*)
                    dest)
           (setq arguments (append arguments `(,dest))))
-        (apply (gethash (car expr) *compilers*) arguments)))
+        (apply (get-compiler compiler) arguments)))
     (t expr)))
 
 (defun autocast (expr type &optional dest)
