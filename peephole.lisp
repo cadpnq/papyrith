@@ -57,6 +57,21 @@
     (kill-instruction)
     t))
 
+(defmacro def-math-optimizer (instructions operation)
+  `(def-optimizer ,instructions
+     (let ((arg1 (instruction-arg1 instruction))
+           (arg2 (instruction-arg2 instruction)))
+       (when (and (numberp arg1)
+                  (numberp arg2))
+         (replace-instruction (assign (instruction-dest instruction)
+                                      (,operation arg1 arg2)))
+         t))))
+
+(def-math-optimizer (integer-add float-add) +)
+(def-math-optimizer (integer-sub float-sub) -)
+(def-math-optimizer (integer-mul float-mul) *)
+(def-math-optimizer (integer-div float-div) /)
+
 (defun target (instruction code)
   (member-if (lambda (e) (equal))))
 
