@@ -36,6 +36,15 @@
             do (setf (instruction-target branch) next-label)))
     t))
 
+;;; When a label is followed by a jump all branches to the label can be
+;;; rewritten to point to the target of the jump.
+(def-optimizer (label)
+  (when (jump-p (second code))
+    (loop with destination = (instruction-target (second code))
+          for branch in (branches-to instruction all-code)
+          do (setf (instruction-target branch) destination))
+    t))
+
 ;;; A label with no branches targeting it can be removed.
 (def-optimizer (label)
   (unless (branches-to instruction all-code)
