@@ -27,6 +27,8 @@
                 `(setf (first code) ,new-instruction)))
       ,@body)))
 
+;;; When two labels are next to one another all branches pointing at the first
+;;; can be rewritten to point to the second.
 (def-optimizer (label)
   (when (label-p (second code))
     (let ((next-label (second code)))
@@ -34,16 +36,20 @@
             do (setf (instruction-target branch) next-label)))
     t))
 
+;;; A label with no branches targeting it can be removed.
 (def-optimizer (label)
   (unless (branches-to instruction all-code)
     (kill-instruction)
     t))
 
+;;; All code between a jump and the next label is dead and can be removed.
+;;; TODO: this also applies to the return instruction
 (def-optimizer (jump)
   (unless (label-p (second code))
     (setf (rest code) (member-if #'label-p (rest code)))
     t))
 
+;;; Branches followed by their target can be removed.
 (def-optimizer (jump jump-f jump-t)
   (when (and (label-p (second code))
              (equal (instruction-target instruction)
@@ -51,12 +57,14 @@
     (kill-instruction)
     t))
 
+;;; Assigning something to itself can be removed.
 (def-optimizer (assign)
   (when (equal (instruction-dest instruction)
                (instruction-arg1 instruction))
     (kill-instruction)
     t))
 
+;;; A math operation with two constants can be turned into an assign.
 (defmacro def-math-optimizer (instructions operation)
   `(def-optimizer ,instructions
      (let ((arg1 (instruction-arg1 instruction))
