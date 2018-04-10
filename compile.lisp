@@ -9,7 +9,7 @@
 (defun bytecode-append (&rest instructions)
   (loop for instruction in instructions
         do (when (instruction-p instruction)
-             (setq *bytecode* (append *bytecode* `(,instruction))))))
+             (push instruction (cdr (last *bytecode*))))))
 
 (defmacro bytecode-append* (&rest instructions)
   `(progn
