@@ -8,3 +8,4 @@
 (load "identifier.lisp")
 (load "instructions.lisp")
 (load "compile.lisp")
+(load "peephole.lisp")
