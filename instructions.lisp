@@ -114,10 +114,11 @@
   (arg1 +string-any+)
   (arg2 +string-any+))
 
-;
-; (def-instructions (cmp-eq cmp-lt cmp-lte cmp-gt cmp-gte)
-;   dest arg1 arg2)
-;;
-;  (def-instructions (assign cast-as)
-;    dest
-;    arg1)
+(def-instructions
+  ((compare-lt comparelt)
+   (compare-lte comparelte)
+   (compare-gt comparegt)
+   (compare-gte comparegte))
+  (dest +bool-variable+)
+  (arg1 +integer-any+)
+  (arg2 +integer-any+))
