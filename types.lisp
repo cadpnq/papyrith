@@ -4,39 +4,39 @@
 ;;; or an Activator will both be an object, but how do we distinguish between
 ;;; them in parameter lists?
 
-(defconstant +label+ '(label))
+(defvar +label+ '(label))
 
-(defconstant +integer-variable+ '(integer-variable))
-(defconstant +integer-literal+ '(integer-literal))
-(defconstant +integer-any+ (append +integer-variable+ +integer-literal+))
+(defvar +integer-variable+ '(integer-variable))
+(defvar +integer-literal+ '(integer-literal))
+(defvar +integer-any+ (append +integer-variable+ +integer-literal+))
 
-(defconstant +float-variable+ '(float-variable))
-(defconstant +float-literal+ '(float-literal))
-(defconstant +float-any+ (append +float-variable+ +float-literal+))
+(defvar +float-variable+ '(float-variable))
+(defvar +float-literal+ '(float-literal))
+(defvar +float-any+ (append +float-variable+ +float-literal+))
 
-(defconstant +bool-variable+ '(bool-variable))
-(defconstant +bool-literal+ '(bool-literal))
-(defconstant +bool-any+ (append +bool-variable+ +bool-literal+))
+(defvar +bool-variable+ '(bool-variable))
+(defvar +bool-literal+ '(bool-literal))
+(defvar +bool-any+ (append +bool-variable+ +bool-literal+))
 
-(defconstant +string-variable+ '(string-variable))
-(defconstant +string-literal+ '(string-literal))
-(defconstant +string-any+ (append +string-variable+ +string-literal+))
+(defvar +string-variable+ '(string-variable))
+(defvar +string-literal+ '(string-literal))
+(defvar +string-any+ (append +string-variable+ +string-literal+))
 
-(defconstant +struct-variable+ '(struct-variable))
+(defvar +struct-variable+ '(struct-variable))
 
-(defconstant +var-variable+ '(var-variable))
+(defvar +var-variable+ '(var-variable))
 
-(defconstant +object-variable+ '(object-variable))
+(defvar +object-variable+ '(object-variable))
 
-(defconstant +integer-array-variable+ '(integer-array-variable))
-(defconstant +float-array-variable+ '(float-array-variable))
-(defconstant +bool-array-variable+ '(bool-array-variable))
-(defconstant +string-array-variable+ '(string-array-variable))
-(defconstant +struct-array-variable+ '(struct-array-variable))
-(defconstant +var-array-variable+ '(var-array-variable))
-(defconstant +object-array-variable+ '(object-array-variable))
+(defvar +integer-array-variable+ '(integer-array-variable))
+(defvar +float-array-variable+ '(float-array-variable))
+(defvar +bool-array-variable+ '(bool-array-variable))
+(defvar +string-array-variable+ '(string-array-variable))
+(defvar +struct-array-variable+ '(struct-array-variable))
+(defvar +var-array-variable+ '(var-array-variable))
+(defvar +object-array-variable+ '(object-array-variable))
 
-(defconstant +any-array+
+(defvar +any-array+
   (append
    +integer-array-variable+
    +float-array-variable+
@@ -46,7 +46,18 @@
    +var-array-variable+
    +object-array-variable+))
 
-(defconstant +any-any+
+(defvar +any-variable+
+ (append
+   +integer-variable+
+   +float-variable+
+   +bool-variable+
+   +string-variable+
+   +struct-variable+
+   +var-variable+
+   +object-variable+
+   +any-array+))
+
+(defvar +any-any+
   (append
    +integer-any+
    +float-any+
