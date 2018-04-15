@@ -5,19 +5,18 @@
     (string :string)
     (identifier (identifier-type a))))
 
-(defvar *bytecode* '(()))
-(defun bytecode-append (&rest instructions)
-  (loop for instruction in instructions
-        do (when (instruction-p instruction)
-             (push instruction (cdr (last *bytecode*))))))
-
-(defmacro bytecode-append* (&rest instructions)
+(defvar *bytecode*)
+(defmacro bytecode (&rest instructions)
   `(progn
     ,@(loop for instruction in instructions
-            collect `(bytecode-append ,instruction))))
+            collect `(bytecode-1 ,instruction))))
+
+(defun bytecode-1 (instruction)
+  (when (instruction-p instruction)
+    (push instruction (cdr (last *bytecode*)))))
 
 (defun compile-papyrus (code)
-  (let ((*bytecode* '(())))
+  (let ((*bytecode* (list (list))))
     (compile-expressions code)
     (cdr *bytecode*)))
 
@@ -48,12 +47,12 @@
           (dest-temp dest))
       (unless (eq (typeof dest) ,dest-type)
         (setq dest-temp (temp-identifier ,dest-type)))
-      (bytecode-append
+      (bytecode
        (,inst dest-temp
          (autocast arg1 ,arg1-type)
          (autocast arg2 ,arg2-type)))
       (unless (eq dest dest-temp)
-        (bytecode-append (cast-as dest dest-temp))))
+        (bytecode (cast-as dest dest-temp))))
     dest))
 
 (defmacro def-dispatching-compiler (name &rest ops)
@@ -112,7 +111,7 @@
      expr)
     (t
      (let ((tmp (temp-identifier type)))
-       (bytecode-append (cast-as tmp expr))
+       (bytecode (cast-as tmp expr))
        tmp))))
 
 (defun new-label ()
@@ -136,38 +135,38 @@
 (def-compiler assign (dest arg1)
   (let ((value (compile-expression arg1 dest)))
     (unless (eq value dest)
-      (bytecode-append (assign dest value))))
+      (bytecode (assign dest value))))
   dest)
 
 (def-compiler if (&rest clauses)
   (let ((exit-label (new-label)))
     (loop for (antecedent . consequent) in clauses
           do (let ((clause-exit (new-label)))
-               (bytecode-append*
+               (bytecode
                  (jump-f (compile-expression antecedent) clause-exit)
                  (compile-expressions consequent)
                  (jump exit-label)
                  clause-exit)))
-    (bytecode-append exit-label)))
+    (bytecode exit-label)))
 
 (defvar *break-label*)
 (defvar *continue-label*)
 (def-compiler break ()
   (if *break-label*
-    (bytecode-append (jump *break-label*))
+    (bytecode (jump *break-label*))
     ; should signal an error here
     ))
 
 (def-compiler continue ()
   (if *continue-label*
-    (bytecode-append (jump *continue-label*))
+    (bytecode (jump *continue-label*))
     ; should signal an error here
     ))
 
 (def-compiler while (condition &rest body)
   (let ((*break-label* (new-label))
         (*continue-label* (new-label)))
-    (bytecode-append*
+    (bytecode
       *continue-label*
       (jump-f (compile-expression condition) *break-label*)
       (compile-expressions body)
@@ -178,7 +177,7 @@
   (let ((*break-label* (new-label))
         (*continue-label* (new-label))
         (entry-label (new-label)))
-    (bytecode-append*
+    (bytecode
       (compile-expression initializer)
       (jump entry-label)
       *continue-label*
