@@ -17,3 +17,8 @@
 
 (set-dispatch-macro-character
   #\# #\` #'|#`-reader|)
+
+; from PAIP
+(defun rest2 (x)
+  "The rest of a list after the first TWO elements."
+  (rest (rest x)))
