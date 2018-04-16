@@ -107,9 +107,6 @@
 (def-math-optimizer (integer-mul float-mul) *)
 (def-math-optimizer (integer-div float-div) /)
 
-(defun target (instruction code)
-  (member-if (lambda (e) (equal))))
-
 (defun branches-to (target-label code)
   (loop for instruction in code
         when (equal target-label (instruction-target instruction))
