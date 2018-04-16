@@ -21,11 +21,29 @@
 (defun make-optimizer (body)
   `(lambda (instruction code all-code)
     (macrolet ((kill-instruction ()
-                `(setf (first code) (second code)
-                       (rest code) (rest2 code)))
+                `(remove-instruction instruction all-code))
               (replace-instruction (new-instruction)
                 `(setf (first code) ,new-instruction)))
       ,@body)))
+
+(defun remove-instruction (instruction code)
+  (let* ((location (member instruction code))
+         (previous
+          (member (second (member (first location)
+                                  (reverse code)))
+                  code))
+         (next (rest location)))
+    (when location
+      (cond
+        ((and (not previous)
+              (not next))
+          (setf (first location) nil
+                (rest location) nil))
+        ((not next)
+         (setf (rest previous) nil))
+        (t
+          (setf (first location) (second location)
+                (rest location) (rest2 location)))))))
 
 ;;; When two labels are next to one another all branches pointing at the first
 ;;; can be rewritten to point to the second.
