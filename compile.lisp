@@ -5,6 +5,8 @@
     (string :string)
     (identifier (identifier-type a))))
 
+(defvar +nonevar+ (make-identifier :type :none :name 'nonevar))
+
 (defvar *bytecode*)
 (defmacro bytecode (&rest instructions)
   `(progn

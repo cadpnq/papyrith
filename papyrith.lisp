@@ -9,3 +9,4 @@
 (load "instructions.lisp")
 (load "compile.lisp")
 (load "peephole.lisp")
+(load "analyze.lisp")

@@ -107,29 +107,48 @@
 (def-math-optimizer (integer-mul float-mul) *)
 (def-math-optimizer (integer-div float-div) /)
 
+;;; Any instruction (except for function calls) where DEST is ::nonevar can be
+;;; removed.
+(def-optimizer (integer-add float-add integer-sub assign)
+  (when (equal (instruction-dest instruction)
+            +nonevar+)
+    (kill-instruction)
+    t))
+
 (defun branches-to (target-label code)
   (loop for instruction in code
         when (equal target-label (instruction-target instruction))
           collect instruction))
 
-(defun optimize-papyrus (code)
-  "Perform peephole optimization on assembly code."
-  (let ((any-change nil))
-    ;; Optimize each tail
-    (loop for code-tail on code do
-          (setf any-change (or (optimize-1 code-tail code)
-                               any-change)))
-    ;; If any changes were made, call optimize again
-    (if any-change
-        (optimize-papyrus code)
-        code)))
+(defun peephole (code)
+ "Perform peephole optimization on assembly code."
+ (when (first code)
+   (let ((any-change nil))
+     ;; Optimize each tail
+     (loop for code-tail on code do
+       (setf any-change (or (peephole-1 code-tail code)
+                            any-change)))
+     ;; If any changes were made, call optimize again
+     (if any-change
+         (peephole code)
+         code)
+     any-change)))
 
-(defun optimize-1 (code all-code)
-  "Perform peephole optimization on a tail of the assembly code.
-  If a change is made, return true."
-  ;; Data-driven by the opcode of the first instruction
-  (let* ((instr (first code))
-         (optimizers (get-optimizers (instruction-op instr))))
-    (when optimizers
-      (loop for optimizer in optimizers
-         thereis (funcall optimizer instr code all-code)))))
+(defun peephole-1 (code all-code)
+ "Perform peephole optimization on a tail of the assembly code.
+ If a change is made, return true."
+ ;; Data-driven by the opcode of the first instruction
+ (let* ((instr (first code))
+        (optimizers (get-optimizers (instruction-op instr))))
+   (when (and optimizers instr)
+     (loop for optimizer in optimizers
+        thereis (funcall optimizer instr code all-code)))))
+
+(defun optimize-papyrus (code)
+  (loop with optimized = t
+        with analyzed = t
+    while (or optimized analyzed)
+      do (setq code (remove nil code))
+         (setq analyzed (analyze code))
+         (setq optimized (peephole code))
+    finally (return code)))
