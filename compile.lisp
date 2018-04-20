@@ -194,3 +194,29 @@
 (def-comparison-compiler compare-lte)
 (def-comparison-compiler compare-gt)
 (def-comparison-compiler compare-gte)
+
+(def-operator-compiler and (arg1 arg2 &optional dest)
+  (let ((end-label (new-label))
+        (comparison (temp-identifier :bool)))
+    (unless dest
+      (setq dest (temp-identifier :bool)))
+    (bytecode
+      (cast-as comparison (compile-expression arg1 comparison))
+      (jump-f comparison end-label)
+      (cast-as comparison (compile-expression arg2 comparison))
+      end-label
+      (assign dest comparison)))
+  dest)
+
+(def-operator-compiler or (arg1 arg2 &optional dest)
+  (let ((end-label (new-label))
+        (comparison (temp-identifier :bool)))
+    (unless dest
+      (setq dest (temp-identifier :bool)))
+    (bytecode
+      (cast-as comparison (compile-expression arg1 comparison))
+      (jump-t comparison end-label)
+      (cast-as comparison (compile-expression arg2 comparison))
+      end-label
+      (assign dest comparison)))
+  dest)
