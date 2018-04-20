@@ -85,7 +85,7 @@
     t))
 
 ;;; Assigning something to itself can be removed.
-(def-optimizer (assign)
+(def-optimizer (assign cast-as)
   (when (equal (instruction-dest instruction)
                (instruction-arg1 instruction))
     (kill-instruction)
@@ -109,7 +109,7 @@
 
 ;;; Any instruction (except for function calls) where DEST is ::nonevar can be
 ;;; removed.
-(def-optimizer (integer-add float-add integer-sub assign)
+(def-optimizer (integer-add float-add integer-sub assign compare-gt compare-gte cast-as)
   (when (equal (instruction-dest instruction)
             +nonevar+)
     (kill-instruction)
@@ -148,7 +148,7 @@
   (loop with optimized = t
         with analyzed = t
     while (or optimized analyzed)
-      do (setq code (remove nil code))
+      do ;(setq code (remove nil code))
          (setq analyzed (analyze code))
          (setq optimized (peephole code))
     finally (return code)))

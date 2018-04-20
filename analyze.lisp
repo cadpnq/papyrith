@@ -53,12 +53,10 @@
                          instruction
                          (live-set dest (cdr code) all-code))))
 
-
 (defparameter *analyzers* (list))
-
 (defmacro def-analyzer (scopes &rest body)
-  `(push (lambda (binding bindings)
-           (destructuring-bind (identifier instruction set) binding
+  `(push (lambda (this bindings)
+           (destructuring-bind (identifier instruction set) this
              (when (member (identifier-scope identifier)
                     ',scopes)
                ,@body)))
@@ -69,11 +67,63 @@
     (setf (instruction-dest instruction) +nonevar+)
     t))
 
+(def-analyzer (:temp)
+  (loop with sibling-bindings = (intersecting-bindings this bindings t)
+        for binding in bindings
+        for (b-identifier b-instruction b-set) in bindings
+        when (eq b-instruction instruction)
+          do (return nil)
+        when (and (disjoint this binding)
+                  (eq :temp (identifier-scope b-identifier))
+                  (not (eq identifier b-identifier))
+                  (eq (identifier-type identifier)
+                      (identifier-type b-identifier)))
+          unless (loop for sibling in sibling-bindings
+                       thereis (not (disjoint sibling binding)))
+            do (rewrite-binding this b-identifier)
+               (loop for sibling in sibling-bindings
+                     do (rewrite-binding sibling b-identifier)
+                     finally (return t))))
+
 (defun analyze (code)
- (let ((bindings (all-bindings code))
-       (any-change nil))
-   (loop for binding in bindings
-     do (loop for analyzer in *analyzers*
-          do (setf any-change (or (funcall analyzer binding bindings)
-                                  any-change))))
-   any-change))
+  (let ((bindings (all-bindings code))
+        (any-change nil))
+    (loop for binding in bindings
+      do (loop for analyzer in *analyzers*
+           do (setf any-change (or (funcall analyzer binding bindings)
+                                   any-change))))
+    any-change))
+
+(defun disjoint (binding1 binding2)
+ (unless (eq binding1 binding2)
+   (not (intersection (third binding1) (third binding2)))))
+
+(defun disjoint-from-every (binding identifier bindings)
+  (not (loop for binding2 in (intersecting-bindings binding bindings)
+            thereis (eq identifier (first binding2)))))
+
+(defun intersecting-bindings (binding1 bindings &optional self)
+  (destructuring-bind (identifier1 instruction1 set1) binding1
+   (loop for binding2 in bindings
+         for (identifier2 instruction2 set2) in bindings
+         unless (eq binding1 binding2)
+           if (and self
+                   (eq identifier1 identifier2)
+                   (intersection set1 set2))
+             collect binding2
+           else
+             when (intersection set1 set2)
+               collect binding2)))
+
+(defun rewrite-binding (binding new)
+  (let ((old (first binding)))
+   (setf (first binding) new
+         (instruction-dest (second binding)) new)
+   (loop for instruction in (third binding)
+         do (rewrite-arguments instruction old new))))
+
+(defun rewrite-arguments (instruction old new)
+  (loop for slot in '(arg1 arg2 arg3 arg4 arg5)
+       when (eq (slot-value instruction slot)
+                 old)
+         do (setf (slot-value instruction slot) new)))
