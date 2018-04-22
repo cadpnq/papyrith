@@ -85,10 +85,6 @@
   (dest +float-variable+)
   (arg1 +float-any+))
 
-; (def-instruction not not
-;   (dest +bool-variable+)
-;   (arg1 +any-any+))
-
 (def-instructions
   ((jump-t jmpt)
    (jump-f jmpf))
@@ -122,3 +118,7 @@
   (dest +bool-variable+)
   (arg1 +integer-any+)
   (arg2 +integer-any+))
+
+(def-instruction logical-not not
+  (dest +any-variable+)
+  (arg1 +any-any+))
