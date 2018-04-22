@@ -27,7 +27,7 @@
             (concatenate 'list this next branch))))))
 
 (defun target (instruction code)
-  (member-if (lambda (e) (equal (instruction-name e)
+  (member-if (lambda (e) (equal e
                                 (instruction-target instruction)))
                code))
 
