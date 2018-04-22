@@ -145,8 +145,8 @@
         thereis (funcall optimizer instr code all-code)))))
 
 (defun optimize-papyrus (code)
-  (loop with optimized = t
-        with analyzed = t
+  (loop with analyzed = (analyze code)
+        with optimized = (peephole code)
     while (or optimized analyzed)
       do ;(setq code (remove nil code))
          (setq analyzed (analyze code))
