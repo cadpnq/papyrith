@@ -84,6 +84,19 @@
     (kill-instruction)
     t))
 
+;;; A conditional branch pointing at an identical conditional branch can be
+;;; rewritten to point to the target of the second one.
+(def-optimizer (jump-f jump-t)
+  (let ((next-instruction (second (target instruction all-code))))
+    (when (and next-instruction
+               (eq (instruction-op instruction)
+                   (instruction-op next-instruction))
+               (eq (instruction-arg1 instruction)
+                   (instruction-arg1 next-instruction)))
+      (setf (instruction-target instruction)
+            (instruction-target next-instruction))
+      t)))
+
 ;;; Assigning something to itself can be removed.
 (def-optimizer (assign cast-as)
   (when (equal (instruction-dest instruction)
