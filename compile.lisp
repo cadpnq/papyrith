@@ -55,7 +55,22 @@
          (autocast arg2 ,arg2-type)))
       (unless (eq dest dest-temp)
         (bytecode (cast-as dest dest-temp))))
-    dest))
+     dest))
+
+(defmacro def-urnary-compiler (name arg1-type dest-type inst)
+  `(def-operator-compiler ,name (arg1 &optional dest)
+    (unless dest
+      (setq dest (temp-identifier ,dest-type)))
+    (let ((arg1 (compile-expression arg1))
+          (dest-temp dest))
+      (unless (eq (typeof dest) ,dest-type)
+        (setq dest-temp (temp-identifier ,dest-type)))
+      (bytecode
+       (,inst dest-temp
+         (autocast arg1 ,arg1-type)))
+      (unless (eq dest dest-temp)
+        (bytecode (cast-as dest dest-temp))))
+     dest))
 
 (defmacro def-dispatching-compiler (name &rest ops)
   `(def-operator-compiler ,name (arg1 arg2 &optional dest)
@@ -220,3 +235,8 @@
       end-label
       (assign dest comparison)))
   dest)
+
+(def-urnary-compiler not :bool :bool logical-not)
+(defun set-to (dest what))
+
+(defun get-from (source what &optional dest))
