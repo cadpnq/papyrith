@@ -173,7 +173,6 @@
   (loop with analyzed = (analyze code)
         with optimized = (peephole code)
     while (or optimized analyzed)
-      do ;(setq code (remove nil code))
-         (setq analyzed (analyze code))
+      do (setq analyzed (analyze code))
          (setq optimized (peephole code))
     finally (return code)))
