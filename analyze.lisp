@@ -17,9 +17,9 @@
                               (target instruction all-code)
                               all-code
                               visited)))
-            (unless (or (not next-instruction)
-                        (eq (instruction-dest next-instruction)
-                            identifier))
+            (when (and next-instruction
+                       (not (eq (instruction-dest instruction)
+                                identifier)))
               (setf next (live-set identifier (cdr code) all-code visited)))
             (when (or (uses identifier instruction)
                       next)
