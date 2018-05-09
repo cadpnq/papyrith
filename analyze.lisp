@@ -121,21 +121,40 @@
           thereis (loop for analyzer in *analyzers*
                         thereis (funcall analyzer binding bindings))))
 
+(defun intersects (binding1 binding2)
+  (unless (eq binding1 binding2)
+    (intersection (third binding1) (third binding2))))
+
 (defun disjoint (binding1 binding2)
- (unless (eq binding1 binding2)
-   (not (intersection (third binding1) (third binding2)))))
+  (not (intersects binding1 binding2)))
 
+(defun bindings-to (identifier bindings)
+  (loop for binding in bindings
+        when (eq (first binding)
+                 identifier)
+          collect binding))
 
+(defun siblings (binding1 bindings)
+  (loop with (identifier1 instruction1 set1) = binding1
+        for binding2 in bindings
+        for (identifier2 instruction2 set2) in bindings
+        unless (eq binding1 binding2)
+          when (and (eq identifier1 identifier2)
+                    (intersection set1 set2))
+            collect binding2))
 
 (defun rewrite-binding (binding new)
   (let ((old (first binding)))
-   (setf (first binding) new
-         (instruction-dest (second binding)) new)
-   (loop for instruction in (third binding)
-         do (rewrite-arguments instruction old new))))
+   (setf (first binding) new)
+   (setf (instruction-dest (second binding)) new)
+   (rewrite-instructions (third binding) old new)))
 
 (defun rewrite-arguments (instruction old new)
   (loop for slot in '(arg1 arg2 arg3 arg4 arg5)
        when (eq (slot-value instruction slot)
                  old)
          do (setf (slot-value instruction slot) new)))
+
+(defun rewrite-instructions (instructions old new)
+  (loop for instruction in instructions
+        do (rewrite-arguments instruction old new)))
