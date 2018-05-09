@@ -3,7 +3,7 @@
   (:print-function
     (lambda (p s k)
       (format s "~A" (identifier-name p)))))
-   name type scope)
+   name type scope subtype)
 
 (defun temp-int ()
   (make-identifier :name (gensym "temp_int")
@@ -15,7 +15,8 @@
                   :type :float
                   :scope :temp))
 
-(defun temp-identifier (type)
+(defun temp-identifier (type &optional subtype)
   (make-identifier :name (gensym (string type))
                    :type type
-                   :scope :temp))
+                   :scope :temp
+                   :subtype subtype))
