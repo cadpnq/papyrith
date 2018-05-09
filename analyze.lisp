@@ -108,13 +108,18 @@
                (return t))))
 
 (defun analyze (code)
-  (let ((bindings (all-bindings code))
-        (any-change nil))
-    (loop for binding in bindings
-      do (loop for analyzer in *analyzers*
-           do (setf any-change (or (funcall analyzer binding bindings)
-                                   any-change))))
-    any-change))
+  (loop with any-change = nil
+        with change = t
+        until (not change)
+          do (setf change (analyze-1 code))
+             (setf any-change (or any-change change))
+        finally (return any-change)))
+
+(defun analyze-1 (code)
+  (loop with bindings = (all-bindings code)
+        for binding in bindings
+          thereis (loop for analyzer in *analyzers*
+                        thereis (funcall analyzer binding bindings))))
 
 (defun disjoint (binding1 binding2)
  (unless (eq binding1 binding2)
