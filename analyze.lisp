@@ -62,6 +62,12 @@
                ,@body)))
          *analyzers*))
 
+(defmacro def-instruction-analyzer (instruction scopes &rest body)
+  `(def-analyzer ,scopes
+    (when (equal (instruction-op instruction)
+                 ',instruction)
+      ,@body)))
+
 (def-analyzer (:local :temp)
   (unless set
     (setf (instruction-dest instruction) +nonevar+)
