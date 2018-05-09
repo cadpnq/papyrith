@@ -257,7 +257,6 @@
 
 (def-compiler = (dest value)
   (let ((dest (compile-ref dest)))
-    (print dest)
     (typecase dest
       (list
         (case (first dest)
