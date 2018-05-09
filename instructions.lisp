@@ -122,3 +122,13 @@
 (def-instruction logical-not not
   (dest +any-variable+)
   (arg1 +any-any+))
+
+(def-instruction array-get-element arraygetelement
+  (dest +any-variable+)
+  (arg1 +any-array+)
+  (arg2 +integer-any+))
+
+(def-instruction array-set-element arraysetelement
+  (arg1 +any-array+)
+  (arg2 +integer-any+)
+  (arg3 +any-any+))

@@ -122,6 +122,20 @@
         (apply (get-compiler compiler) arguments)))
     (t expr)))
 
+(defun compile-ref (expr)
+  (typecase expr
+    (symbol (compile-expression expr))
+    (identifier expr)
+    (list
+      (case (first expr)
+        (dot
+          (print (second expr))
+          (print (compile-expression (second expr)))
+          `(dot ,(compile-expression (second expr)) ,(third expr)))
+        (aref `(aref ,(compile-expression (second expr))
+                     ,(compile-expression (third expr))))))
+    (t expr)))
+
 (defun autocast (expr type &optional dest)
   (cond
     ((eq (typeof expr) type)
@@ -237,6 +251,27 @@
   dest)
 
 (def-urnary-compiler not :bool :bool logical-not)
-(defun set-to (dest what))
 
-(defun get-from (source what &optional dest))
+(def-compiler dot (a b)
+  (list 'dot a b))
+
+(def-compiler = (dest value)
+  (let ((dest (compile-ref dest)))
+    (print dest)
+    (typecase dest
+      (list
+        (case (first dest)
+          (aref (bytecode (array-set-element (second dest)
+                                             (third dest)
+                                             (compile-expression value))))))
+      (identifier
+        (compile-expression value dest)))))
+
+(def-operator-compiler aref (array index &optional dest)
+  (unless dest
+    (setf dest (temp-identifier (identifier-subtype array))))
+  (bytecode
+    (array-get-element dest
+                       (compile-expression array)
+                       (compile-expression index)))
+  dest)
