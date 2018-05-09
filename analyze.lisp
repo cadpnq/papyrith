@@ -120,22 +120,7 @@
  (unless (eq binding1 binding2)
    (not (intersection (third binding1) (third binding2)))))
 
-(defun disjoint-from-every (binding identifier bindings)
-  (not (loop for binding2 in (intersecting-bindings binding bindings)
-            thereis (eq identifier (first binding2)))))
 
-(defun intersecting-bindings (binding1 bindings &optional self)
-  (destructuring-bind (identifier1 instruction1 set1) binding1
-   (loop for binding2 in bindings
-         for (identifier2 instruction2 set2) in bindings
-         unless (eq binding1 binding2)
-           if (and self
-                   (eq identifier1 identifier2)
-                   (intersection set1 set2))
-             collect binding2
-           else
-             when (intersection set1 set2)
-               collect binding2)))
 
 (defun rewrite-binding (binding new)
   (let ((old (first binding)))
