@@ -89,22 +89,23 @@
       t)))
 
 (def-analyzer (:temp)
-  (loop with sibling-bindings = (intersecting-bindings this bindings t)
+  (loop with these = (concatenate 'list (siblings this bindings)
+                                        (list this))
+        with those = nil
         for binding in bindings
-        for (b-identifier b-instruction b-set) in bindings
-        when (eq b-instruction instruction)
-          do (return nil)
-        when (and (disjoint this binding)
-                  (eq :temp (identifier-scope b-identifier))
-                  (not (eq identifier b-identifier))
-                  (eq (identifier-type identifier)
-                      (identifier-type b-identifier)))
-          unless (loop for sibling in sibling-bindings
-                       thereis (not (disjoint sibling binding)))
-            do (rewrite-binding this b-identifier)
-               (loop for sibling in sibling-bindings
-                     do (rewrite-binding sibling b-identifier)
-                     finally (return t))))
+        for (identifier2 instruction2 set2) in bindings
+        if (eq identifier identifier2)
+          return nil
+        else
+          do (setf those (bindings-to identifier2 bindings))
+             (when (and (eq (identifier-scope identifier2) :temp)
+                        (eq (identifier-type identifier)
+                            (identifier-type identifier2))
+                        (not (loop for x in these
+                                   thereis (loop for y in those
+                                                 thereis (intersects x y)))))
+               (mapcar #'(lambda (x) (rewrite-binding x identifier2)) these)
+               (return t))))
 
 (defun analyze (code)
   (let ((bindings (all-bindings code))
