@@ -73,6 +73,21 @@
     (setf (instruction-dest instruction) +nonevar+)
     t))
 
+(defun papyrus-constant (val)
+  (or (numberp val)
+      (stringp val)
+      (eq val +nonevar+)))
+
+(def-instruction-analyzer assign (:local :temp)
+  (let ((value (instruction-arg1 instruction))
+        (siblings (siblings this bindings)))
+    (when (and (not siblings)
+               (papyrus-constant value)
+               set)
+      (rewrite-instructions set identifier value)
+      (setf (instruction-dest instruction) +nonevar+)
+      t)))
+
 (def-analyzer (:temp)
   (loop with sibling-bindings = (intersecting-bindings this bindings t)
         for binding in bindings
