@@ -122,23 +122,11 @@
 
 ;;; Any instruction (except for function calls) where DEST is ::nonevar can be
 ;;; removed.
-(def-optimizer (integer-add float-add integer-sub assign compare-gt compare-gte cast-as logical-not)
+(def-optimizer (integer-add float-add integer-sub compare-gt compare-gte cast-as logical-not assign)
   (when (equal (instruction-dest instruction)
             +nonevar+)
     (kill-instruction)
     t))
-
-; (defun scope-is (id scope)
-;   (when (identifier-p id)
-;     (eq (identifier-scope id)
-;         scope)))
-;
-; (defun localp (id) (scope-is id :local))
-; (defun tempp (id) (scope-is id :temp))
-; (defun scriptp (id) (scope-is id :script))
-; (defun propertyp (id) (scope-is id :property))
-;
-; (def-optimizer (logical-not))
 
 (defun branches-to (target-label code)
   (loop for instruction in code
