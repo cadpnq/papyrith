@@ -31,6 +31,15 @@
 (defvar +object+ (papyrus-type :object))
 (defvar +label+ (papyrus-type :label))
 
+(defvar *autocast-rules* '((+bool+ +any+)
+                           (+int+)
+                           (+float+ +int+)
+                           (+string+ +any+)
+                           (+object+ +object+)
+                           (+array+)
+                           (+struct+)
+                           (+var+ +bool+ +int+ +float+ +string+ +object+ +struct+)))
+
 (defun type-match (type1 type2)
   (unless (papyrus-type-p type1)
     (setf type1 (papyrus-type type1)))
