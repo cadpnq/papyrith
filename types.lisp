@@ -16,6 +16,8 @@
 
 (defun papyrus-type (type &optional (constructor #'make-papyrus-type))
   (typecase type
+    (papyrus-type (funcall constructor :type (papyrus-type-type type)
+                                       :subtype (papyrus-type-subtype type)))
     (keyword (funcall constructor :type type))
     (list (funcall constructor :type (first type)
                                :subtype (second type)))))
