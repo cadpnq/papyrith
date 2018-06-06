@@ -42,3 +42,11 @@
                (papyrus-type-type type2))
            (eq (papyrus-type-subtype type1)
                (papyrus-type-subtype type2)))))
+
+(defun typeof (a)
+  (typecase a
+    (papyrus-type a)
+    (integer +int+)
+    (float +float+)
+    (string +string+)))
+

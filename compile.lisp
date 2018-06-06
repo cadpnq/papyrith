@@ -1,9 +1,3 @@
-(defun typeof (a)
-  (typecase a
-    (integer :integer)
-    (float :float)
-    (string :string)
-    (identifier (identifier-type a))))
 
 (defvar +nonevar+ (make-identifier :type :none :name 'nonevar))
 
