@@ -31,37 +31,18 @@
     (push ',name *operators*)
     (def-compiler ,name ,args ,@body)))
 
-(defmacro def-binary-compiler (name arg1-type arg2-type dest-type inst)
-  `(def-operator-compiler ,name (arg1 arg2 &optional dest)
-    (unless dest
-      (setq dest (temp-identifier ,dest-type)))
-    (let ((arg1 (compile-expression arg1))
-          (arg2 (compile-expression arg2))
-          (dest-temp dest))
-      (unless (eq (typeof dest) ,dest-type)
-        (setq dest-temp (temp-identifier ,dest-type)))
-      (bytecode
-       (,inst dest-temp
-         (autocast arg1 ,arg1-type)
-         (autocast arg2 ,arg2-type)))
-      (unless (eq dest dest-temp)
-        (bytecode (cast-as dest dest-temp))))
-     dest))
-
-(defmacro def-urnary-compiler (name arg1-type dest-type inst)
-  `(def-operator-compiler ,name (arg1 &optional dest)
-    (unless dest
-      (setq dest (temp-identifier ,dest-type)))
-    (let ((arg1 (compile-expression arg1))
-          (dest-temp dest))
-      (unless (eq (typeof dest) ,dest-type)
-        (setq dest-temp (temp-identifier ,dest-type)))
-      (bytecode
-       (,inst dest-temp
-         (autocast arg1 ,arg1-type)))
-      (unless (eq dest dest-temp)
-        (bytecode (cast-as dest dest-temp))))
-     dest))
+(defmacro def-simple-operator (name arg-types dest-type instruction)
+  (let ((args (loop for arg in arg-types
+                    for i from 1
+                    collect (symb 'arg i))))
+  `(def-operator-compiler ,name (,@args &optional dest)
+    (unless (type-match dest ,dest-type)
+      (setf dest (temp-identifier ,dest-type)))
+    (let ,(loop for arg-type in arg-types
+                for arg in args
+                collect `(,arg (compile-as ,arg ,arg-type)))
+      (emit (,instruction dest ,@args))
+      dest))))
 
 (defmacro def-dispatching-compiler (name &rest ops)
   `(def-operator-compiler ,name (arg1 arg2 &optional dest)
@@ -75,24 +56,22 @@
                            (compile-expression `(,compiler ,arg1 ,arg2) dest))))))))
 
 (defmacro def-math-compiler (name)
- (let ((integer-name (symb 'integer- name))
+  (let ((integer-name (symb 'integer- name))
         (float-name (symb 'float- name)))
-   `(progn
-     (def-binary-compiler ,integer-name :integer :integer :integer ,integer-name)
-     (def-binary-compiler ,float-name :float :float :float ,float-name)
-     (def-dispatching-compiler ,name
-       (:float ,float-name)
-       (:integer ,integer-name)))))
+    `(progn (def-simple-operator ,integer-name (:integer :integer) :integer ,integer-name)
+            (def-simple-operator ,float-name (:float :float) :float ,float-name)
+            (def-dispatching-compiler ,name
+                                      (:float ,float-name)
+                                      (:integer ,integer-name)))))
 
 (defmacro def-comparison-compiler (name)
   (let ((integer-name (symb 'integer- name))
         (float-name (symb 'float- name)))
-    `(progn
-      (def-binary-compiler ,integer-name :integer :integer :bool ,name)
-      (def-binary-compiler ,float-name :float :float :bool ,name)
-      (def-dispatching-compiler ,name
-        (:float ,float-name)
-        (:integer ,integer-name)))))
+    `(progn (def-simple-operator ,integer-name (:integer :integer) :bool ,integer-name)
+            (def-simple-operator ,float-name (:float :float) :bool ,float-name)
+            (def-dispatching-compiler ,name
+                                      (:float ,float-name)
+                                      (:integer ,integer-name)))))
 
 (defun compile-expressions (code)
   (mapcar #'compile-expression code))
@@ -139,9 +118,9 @@
 (defun new-label ()
   (label (gensym "label")))
 
-(def-binary-compiler i+ :integer :integer :integer integer-add)
-(def-binary-compiler f+ :float :float :float float-add)
-(def-binary-compiler s+ :string :string :string string-cat)
+(def-simple-operator i+ (:int :int) :int integer-add)
+(def-simple-operator f+ (:float :float) :float float-add)
+(def-simple-operator s+ (:string :string) :string string-cat)
 
 (def-dispatching-compiler plus
   (:string s+)
@@ -152,7 +131,7 @@
 (def-math-compiler mul)
 (def-math-compiler div)
 
-(def-binary-compiler integer-mod :integer :integer :integer integer-mod)
+(def-simple-operator integer-mod (:integer :integer) :integer integer-mod)
 
 (def-compiler assign (dest arg1)
   (let ((value (compile-expression arg1 dest)))
@@ -241,7 +220,7 @@
       (assign dest comparison)))
   dest)
 
-(def-urnary-compiler not :bool :bool logical-not)
+(def-simple-operator not (+any+) :bool logical-not)
 
 (def-compiler dot (a b)
   (list 'dot a b))
