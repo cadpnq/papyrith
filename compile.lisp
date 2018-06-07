@@ -2,14 +2,11 @@
 (defvar +nonevar+ (make-identifier :type :none :name 'nonevar))
 
 (defvar *bytecode*)
-(defmacro bytecode (&rest instructions)
+(defmacro emit (&rest instructions)
   `(progn
     ,@(loop for instruction in instructions
-            collect `(bytecode-1 ,instruction))))
-
-(defun bytecode-1 (instruction)
-  (when (instruction-p instruction)
-    (push instruction (cdr (last *bytecode*)))))
+            collect `(when (instruction-p ,instruction)
+                      (push ,instruction (rest (last *bytecode*)))))))
 
 (defun compile-papyrus (code)
   (let ((*bytecode* (list (list))))
@@ -160,38 +157,38 @@
 (def-compiler assign (dest arg1)
   (let ((value (compile-expression arg1 dest)))
     (unless (eq value dest)
-      (bytecode (assign dest value))))
+      (emit (assign dest value))))
   dest)
 
 (def-compiler if (&rest clauses)
   (let ((exit-label (new-label)))
     (loop for (antecedent . consequent) in clauses
           do (let ((clause-exit (new-label)))
-               (bytecode
+               (emit
                  (jump-f (compile-expression antecedent) clause-exit)
                  (compile-expressions consequent)
                  (jump exit-label)
                  clause-exit)))
-    (bytecode exit-label)))
+    (emit exit-label)))
 
 (defvar *break-label*)
 (defvar *continue-label*)
 (def-compiler break ()
   (if *break-label*
-    (bytecode (jump *break-label*))
+    (emit (jump *break-label*))
     ; should signal an error here
     ))
 
 (def-compiler continue ()
   (if *continue-label*
-    (bytecode (jump *continue-label*))
+    (emit (jump *continue-label*))
     ; should signal an error here
     ))
 
 (def-compiler while (condition &rest body)
   (let ((*break-label* (new-label))
         (*continue-label* (new-label)))
-    (bytecode
+    (emit
       *continue-label*
       (jump-f (compile-expression condition) *break-label*)
       (compile-expressions body)
@@ -202,7 +199,7 @@
   (let ((*break-label* (new-label))
         (*continue-label* (new-label))
         (entry-label (new-label)))
-    (bytecode
+    (emit
       (compile-expression initializer)
       (jump entry-label)
       *continue-label*
@@ -223,7 +220,7 @@
         (comparison (temp-identifier :bool)))
     (unless dest
       (setq dest (temp-identifier :bool)))
-    (bytecode
+    (emit
       (cast-as comparison (compile-expression arg1 comparison))
       (jump-f comparison end-label)
       (cast-as comparison (compile-expression arg2 comparison))
@@ -236,7 +233,7 @@
         (comparison (temp-identifier :bool)))
     (unless dest
       (setq dest (temp-identifier :bool)))
-    (bytecode
+    (emit
       (cast-as comparison (compile-expression arg1 comparison))
       (jump-t comparison end-label)
       (cast-as comparison (compile-expression arg2 comparison))
@@ -254,7 +251,7 @@
     (typecase dest
       (list
         (case (first dest)
-          (aref (bytecode (array-set-element (second dest)
+          (aref (emit (array-set-element (second dest)
                                              (third dest)
                                              (compile-expression value))))))
       (identifier
@@ -263,7 +260,7 @@
 (def-operator-compiler aref (array index &optional dest)
   (unless dest
     (setf dest (temp-identifier (identifier-subtype array))))
-  (bytecode
+  (emit
     (array-get-element dest
                        (compile-expression array)
                        (compile-expression index)))
