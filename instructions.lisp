@@ -29,6 +29,11 @@
     (lambda (p s k)
       (format s "~A" (instruction-name p))))))
 
+(defun print-instruction (instruction)
+  (if (label-p instruction)
+    (format nil "~A:" instruction)
+    (format nil "~A" instruction)))
+
 (def-instructions
   ((integer-add iadd)
    (integer-sub isub)
