@@ -18,6 +18,8 @@
   (typecase type
     (papyrus-type (funcall constructor :type (papyrus-type-type type)
                                        :subtype (papyrus-type-subtype type)))
+    (string +string+)
+    (integer +int+)
     (keyword (funcall constructor :type type))
     (list (funcall constructor :type (first type)
                                :subtype (second type)))))
