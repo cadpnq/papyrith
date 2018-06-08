@@ -125,7 +125,7 @@
 (def-dispatching-compiler plus
   (:string s+)
   (:float f+)
-  (:integer i+))
+  (:int i+))
 
 (def-math-compiler sub)
 (def-math-compiler mul)
