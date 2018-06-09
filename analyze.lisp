@@ -81,6 +81,8 @@
 (defun papyrus-constant (val)
   (or (numberp val)
       (stringp val)
+      (eq val +false+)
+      (eq val +true+)
       (eq val +nonevar+)))
 
 (def-instruction-analyzer assign (:local :temp)
