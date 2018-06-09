@@ -185,8 +185,12 @@
 (def-operator-compiler and (arg1 arg2 &optional dest)
   (let ((end-label (new-label))
         (comparison (temp-identifier :bool)))
-    (unless dest
-      (setq dest (temp-identifier :bool)))
+    (when (and dest
+               (or (eq (identifier-scope dest) :local)
+                   (eq (identifier-scope dest) :temp)))
+      (setf comparison dest))
+    (unless (type-match dest :bool)
+      (setf dest comparison))
     (emit
       (cast-as comparison (compile-expression arg1 comparison))
       (jump-f comparison end-label)
@@ -198,8 +202,12 @@
 (def-operator-compiler or (arg1 arg2 &optional dest)
   (let ((end-label (new-label))
         (comparison (temp-identifier :bool)))
-    (unless dest
-      (setq dest (temp-identifier :bool)))
+    (when (and dest
+               (or (eq (identifier-scope dest) :local)
+                   (eq (identifier-scope dest) :temp)))
+      (setf comparison dest))
+    (unless (type-match dest :bool)
+      (setf dest comparison))
     (emit
       (cast-as comparison (compile-expression arg1 comparison))
       (jump-t comparison end-label)
