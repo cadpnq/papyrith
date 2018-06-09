@@ -260,3 +260,37 @@
                        (compile-expression array)
                        (compile-as index :int)))
   dest)
+
+(defun compile-script (script)
+  (let ((*script* script)
+        (*object* (first (script-object-table script))))
+    (dolist (*property* (papyrus-object-property-table *object*))
+      (compile-property *property*))
+    (dolist (*state* (papyrus-object-state-table *object*))
+      (compile-state *state*))))
+
+(defun compile-property (property)
+  (dolist (function (papyrus-property-functions property))
+    (compile-function function)))
+
+(defun compile-state (state)
+  (dolist (*function* (papyrus-state-functions state))
+    (compile-function *function*)))
+
+(defun compile-function (function)
+  (let* ((*function* function)
+         (code (compile-papyrus (papyrus-function-ast *function*))))
+    (format t "unoptimized-code:~%~{~A~%~}~%" code)
+    (setf code (optimize-papyrus code))
+    (when (first code)
+      (setf (papyrus-function-code function) code)
+      (setf (papyrus-function-local-table *function*)
+            (remove-duplicates (loop with dest = nil
+                  with scope = nil
+                  for instruction in code
+                  when (instruction-dest instruction)
+                    do (setf dest (instruction-dest instruction)
+                             scope (identifier-scope dest))
+                    when (or (eq scope :local)
+                             (eq scope :temp))
+                      collect dest))))))
