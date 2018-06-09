@@ -68,6 +68,11 @@
                  ',instruction)
       ,@body)))
 
+(defmacro def-instruction-analyzers (instructions scopes &rest body)
+  `(progn
+    ,@(loop for instruction in instructions
+            collect `(def-instruction-analyzer ,instruction ,scopes ,@body))))
+
 (def-analyzer (:local :temp :parameter)
   (unless set
     (setf (instruction-dest instruction) +nonevar+)
@@ -124,6 +129,13 @@
 (defun intersects (binding1 binding2)
   (unless (eq binding1 binding2)
     (intersection (third binding1) (third binding2))))
+
+(defun instruction-intersects (instruction binding)
+  (intersects (list instruction) binding))
+
+(defun sibling-intersection (instruction siblings)
+  (loop for sibling in siblings
+        thereis (instruction-intersects instruction sibling)))
 
 (defun disjoint (binding1 binding2)
   (not (intersects binding1 binding2)))
