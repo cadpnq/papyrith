@@ -5,6 +5,12 @@
       (format s "~A" (identifier-name p)))))
    name scope)
 
+(defvar +nonevar+ (make-identifier :type :none :name 'nonevar))
+(defvar +self+ (make-identifier :type :self :name 'self))
+(defvar +true+ (make-identifier :type :bool :name 'true))
+(defvar +false+ (make-identifier :type :bool :name 'false))
+(defvar +none+ (make-identifier :type :none :name 'none))
+
 (defstruct (papyrus-parameter
   (:include identifier
             (scope :parameter)))

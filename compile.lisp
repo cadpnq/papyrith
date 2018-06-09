@@ -1,6 +1,3 @@
-
-(defvar +nonevar+ (make-identifier :type :none :name 'nonevar))
-
 (defvar *bytecode*)
 (defmacro emit (&rest instructions)
   `(progn
