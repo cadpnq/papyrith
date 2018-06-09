@@ -123,7 +123,7 @@
 ;;; Any instruction (except for function calls) where DEST is ::nonevar can be
 ;;; removed.
 (def-optimizer (integer-add float-add integer-sub compare-gt compare-gte cast-as logical-not assign)
-  (when (equal (instruction-dest instruction)
+  (when (eq (instruction-dest instruction)
             +nonevar+)
     (kill-instruction)
     t))
