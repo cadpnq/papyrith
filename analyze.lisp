@@ -78,6 +78,8 @@
     (setf (instruction-dest instruction) +nonevar+)
     t))
 
+;;; TODO: this is technically incorrect. We cannot propagate a constant in a CAST instruction
+;;; without "precasting" it first.
 (def-instruction-analyzers (assign cast-as) (:local :temp)
   (let ((value (instruction-arg1 instruction))
         (siblings (siblings this bindings))
