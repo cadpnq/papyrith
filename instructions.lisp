@@ -34,6 +34,9 @@
     (format nil "~A:" instruction)
     (format nil "~A" instruction)))
 
+(defun new-label ()
+  (label (gensym "label")))
+
 (def-instructions
   ((integer-add iadd)
    (integer-sub isub)

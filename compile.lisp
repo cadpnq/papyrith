@@ -115,9 +115,6 @@
        (bytecode (cast-as tmp expr))
        tmp))))
 
-(defun new-label ()
-  (label (gensym "label")))
-
 (def-simple-operator i+ (:int :int) :int integer-add)
 (def-simple-operator f+ (:float :float) :float float-add)
 (def-simple-operator s+ (:string :string) :string string-cat)
