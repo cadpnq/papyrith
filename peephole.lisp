@@ -128,6 +128,22 @@
     (kill-instruction)
     t))
 
+;;; Branches where the condition is a constant can be rewritten or removed depending on the
+;;; boolean value of the constant.
+(def-optimizer (jump-f)
+  (let ((value (instruction-arg1 instruction)))
+    (when (papyrus-constant value)
+      (cond ((truthy-constant value) (kill-instruction))
+            ((falsy-constant value) (replace-instruction (jump (instruction-target instruction)))))
+      t)))
+
+(def-optimizer (jump-t)
+  (let ((value (instruction-arg1 instruction)))
+    (when (papyrus-constant value)
+      (cond ((falsy-constant value) (kill-instruction))
+            ((truthy-constant value) (replace-instruction (jump (instruction-target instruction)))))
+      t)))
+
 (defun branches-to (target-label code)
   (loop for instruction in code
         when (equal target-label (instruction-target instruction))
