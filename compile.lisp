@@ -103,14 +103,12 @@
                      ,(compile-expression (third expr))))))
     (t expr)))
 
-(defun autocast (expr type &optional dest)
-  (cond
-    ((eq (typeof expr) type)
-     expr)
-    (t
-     (let ((tmp (temp-identifier type)))
-       (bytecode (cast-as tmp expr))
-       tmp))))
+(defun autocast (value type)
+  (if (type-match value type)
+    value
+    (let ((temp (temp-identifier type)))
+      (emit (cast-as temp value))
+      temp)))
 
 (def-simple-operator i+ (:int :int) :int integer-add)
 (def-simple-operator f+ (:float :float) :float float-add)
