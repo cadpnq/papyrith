@@ -80,13 +80,17 @@
 ; compiler function should return identifier
 (defun compile-expression (expr &optional dest)
   (typecase expr
-    (list
-      (let ((compiler (car expr))
-            (arguments (cdr expr)))
-        (when (and (member compiler *operators*)
-                   dest)
-          (setq arguments (append arguments `(,dest))))
-        (apply (get-compiler compiler) arguments)))
+    (list (destructuring-bind (compiler-name . arguments) expr
+            (when (and (member compiler-name *operators*)
+                       dest)
+              (setf arguments (append arguments (list dest))))
+            (let ((compiler (get-compiler compiler-name)))
+              (when compiler
+                (apply compiler arguments)))))
+    (symbol (case expr
+              (true +true+)
+              (false +false+)
+              (t (lookup-identifier expr))))
     (t expr)))
 
 
