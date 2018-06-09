@@ -78,13 +78,6 @@
     (setf (instruction-dest instruction) +nonevar+)
     t))
 
-(defun papyrus-constant (val)
-  (or (numberp val)
-      (stringp val)
-      (eq val +false+)
-      (eq val +true+)
-      (eq val +nonevar+)))
-
 (def-instruction-analyzers (assign cast-as) (:local :temp)
   (let ((value (instruction-arg1 instruction))
         (siblings (siblings this bindings))
