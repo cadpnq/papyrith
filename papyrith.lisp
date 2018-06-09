@@ -5,6 +5,8 @@
 
 (load "auxfns.lisp")
 (load "types.lisp")
+(load "script.lisp")
+(load "ir.lisp")
 (load "identifier.lisp")
 (load "instructions.lisp")
 (load "compile.lisp")
