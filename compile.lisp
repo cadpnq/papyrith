@@ -93,14 +93,10 @@
   (typecase expr
     (symbol (compile-expression expr))
     (identifier expr)
-    (list
-      (case (first expr)
-        (dot
-          (print (second expr))
-          (print (compile-expression (second expr)))
-          `(dot ,(compile-expression (second expr)) ,(third expr)))
-        (aref `(aref ,(compile-expression (second expr))
-                     ,(compile-expression (third expr))))))
+    (list (case (first expr)
+            (dot (list 'dot (compile-expression (second expr)) (third expr)))
+            (aref (list 'aref (compile-expression (second expr))
+                              (compile-expression (third expr))))))
     (t expr)))
 
 (defun autocast (value type)
