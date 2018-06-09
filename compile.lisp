@@ -168,6 +168,9 @@
     ; should signal an error here
     ))
 
+(def-compiler return (value)
+  (emit (ret (compile-as value (papyrus-function-return-type *function*)))))
+
 (def-compiler while (condition &rest body)
   (let ((*break-label* (new-label))
         (*continue-label* (new-label)))
