@@ -68,7 +68,7 @@
                  ',instruction)
       ,@body)))
 
-(def-analyzer (:local :temp)
+(def-analyzer (:local :temp :parameter)
   (unless set
     (setf (instruction-dest instruction) +nonevar+)
     t))
