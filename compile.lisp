@@ -89,6 +89,10 @@
         (apply (get-compiler compiler) arguments)))
     (t expr)))
 
+
+(defun compile-as (expr type)
+  (autocast (compile-expression expr) type))
+
 (defun compile-ref (expr)
   (typecase expr
     (symbol (compile-expression expr))
