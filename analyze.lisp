@@ -130,7 +130,7 @@
     (intersection (third binding1) (third binding2))))
 
 (defun instruction-intersects (instruction binding)
-  (intersects (list instruction) binding))
+  (intersects (list nil nil (list instruction)) binding))
 
 (defun sibling-intersection (instruction siblings)
   (loop for sibling in siblings
