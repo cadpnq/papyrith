@@ -90,6 +90,18 @@
     (t expr)))
 
 
+(defun lookup-identifier (id)
+  (or (lookup id (papyrus-function-local-table *function*))
+      (lookup id (papyrus-function-param-table *function*))))
+
+(defun lookup-property (id))
+
+(defun lookup (id list)
+  (loop for identifier in list
+        when (eql (identifier-name identifier)
+                  id)
+          return identifier))
+
 (defun compile-as (expr type)
   (autocast (compile-expression expr) type))
 
