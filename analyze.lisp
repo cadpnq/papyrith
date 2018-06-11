@@ -80,7 +80,7 @@
 
 ;;; TODO: this is technically incorrect. We cannot propagate a constant in a CAST instruction
 ;;; without "precasting" it first.
-(def-instruction-analyzers (assign cast-as) (:local :temp)
+(def-instruction-analyzers (assign cast-as) (:local :temp :parameter)
   (let ((value (instruction-arg1 instruction))
         (siblings (siblings this bindings))
         (made-change nil))
