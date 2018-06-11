@@ -128,6 +128,15 @@
     (kill-instruction)
     t))
 
+;;; A NOT instruction with a constant can be turned into an ASSIGN with either true or false.
+(def-optimizer (logical-not)
+  (let ((value (instruction-arg1 instruction))
+        (dest (instruction-dest instruction)))
+    (cond ((truthy-constant value) (replace-instruction (assign dest +false+))
+                                   t)
+          ((falsy-constant value) (replace-instruction (assign dest +true+))
+                                  t))))
+
 ;;; Branches where the condition is a constant can be rewritten or removed depending on the
 ;;; boolean value of the constant.
 (def-optimizer (jump-f)
