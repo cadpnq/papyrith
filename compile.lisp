@@ -265,6 +265,13 @@
                        (compile-as index :int)))
   dest)
 
+(def-compiler variable (type name &optional value)
+  (unless (lookup-identifier name))
+    (let ((local (papyrus-local name type)))
+      (push local (papyrus-function-local-table *function*))
+      (when value
+        (compile-expression value local))))
+
 (defun compile-script (script)
   (let ((*script* script)
         (*object* (first (script-object-table script))))
