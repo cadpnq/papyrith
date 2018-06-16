@@ -130,7 +130,7 @@
 (def-simple-operator f+ (:float :float) :float float-add)
 (def-simple-operator s+ (:string :string) :string string-cat)
 
-(def-dispatching-compiler plus
+(def-dispatching-compiler +
   (:string s+)
   (:float f+)
   (:int i+))
