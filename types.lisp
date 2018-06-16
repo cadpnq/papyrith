@@ -72,15 +72,19 @@
       (eq val +nonevar+)))
 
 (defun falsy-constant (val)
-  (when (papyrus-constant val)
-    (or (eq val +false+)
-        (typecase val
-          (integer (eq val 0))
-          (float (eq val 0.0))
-          (string (string= val ""))))))
+  (if (symbolp val)
+    (equal val 'false)
+    (when (papyrus-constant val)
+      (or (eq val +false+)
+          (typecase val
+            (integer (eq val 0))
+            (float (eq val 0.0))
+            (string (string= val "")))))))
 
 (defun truthy-constant (val)
-  (when (papyrus-constant val)
-    (or (eq val +true+)
-        (not (falsy-constant val)))))
+  (if (symbolp val)
+    (equal val 'true)
+    (when (papyrus-constant val)
+      (or (eq val +true+)
+          (not (falsy-constant val))))))
 
