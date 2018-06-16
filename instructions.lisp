@@ -84,13 +84,21 @@
   dest
   arg1)
 
+(def-instruction is is
+  dest
+  arg1
+  arg2)
+
+(def-instruction nop nop)
+
 (def-instruction string-cat strcat
   dest
   arg1
   arg2)
 
 (def-instructions
-  ((compare-lt comparelt)
+  ((compare-eq compareeq)
+   (compare-lt comparelt)
    (compare-lte comparelte)
    (compare-gt comparegt)
    (compare-gte comparegte))
@@ -102,6 +110,12 @@
   dest
   arg1)
 
+(def-instruction prop-get propget)
+(def-instruction prop-set propset)
+
+(def-instruction array-create arraycreate)
+(def-instruction array-length arraylength)
+
 (def-instruction array-get-element arraygetelement
   dest
   arg1
@@ -111,3 +125,21 @@
   arg1
   arg2
   arg3)
+
+(def-instruction array-find-element arrayfindelement)
+(def-instruction array-rfind-element arrayrfindelement)
+(def-instruction array-add arrayadd)
+(def-instruction array-insert arrayinsert)
+(def-instruction array-remove-last arrayremovelast)
+(def-instruction array-remove arrayremove)
+(def-instruction array-clear arrayclear)
+(def-instruction array-find-struct arrayfindstruct)
+(def-instruction array-rfind-struct arrayrfindstruct)
+
+(def-instruction struct-create structcreate)
+(def-instruction struct-get structget)
+(def-instruction struct-set structset)
+
+(def-instruction call-method-papyrus callmethod)
+(def-instruction call-parent callparent)
+(def-instruction call-static callstatic)
