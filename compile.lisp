@@ -214,12 +214,14 @@
       (setf comparison dest))
     (unless (type-match dest :bool)
       (setf dest comparison))
-    (emit
-      (cast-as comparison (compile-expression arg1 comparison))
-      (jump-f comparison end-label)
-      (cast-as comparison (compile-expression arg2 comparison))
-      end-label
-      (assign dest comparison)))
+    (if (or (falsy-constant arg1)
+            (falsy-constant arg2))
+      (emit (assign dest +false+))
+      (emit (cast-as comparison (compile-expression arg1 comparison))
+            (jump-f comparison end-label)
+            (cast-as comparison (compile-expression arg2 comparison))
+            end-label
+            (assign dest comparison))))
   dest)
 
 (def-operator-compiler or (arg1 arg2 &optional dest)
@@ -231,12 +233,14 @@
       (setf comparison dest))
     (unless (type-match dest :bool)
       (setf dest comparison))
-    (emit
-      (cast-as comparison (compile-expression arg1 comparison))
-      (jump-t comparison end-label)
-      (cast-as comparison (compile-expression arg2 comparison))
-      end-label
-      (assign dest comparison)))
+    (if (or (truthy-constant arg1)
+            (truthy-constant arg2))
+      (emit (assign dest +true+))
+      (emit (cast-as comparison (compile-expression arg1 comparison))
+            (jump-t comparison end-label)
+            (cast-as comparison (compile-expression arg2 comparison))
+            end-label
+            (assign dest comparison))))
   dest)
 
 (def-simple-operator not (+any+) :bool logical-not)
