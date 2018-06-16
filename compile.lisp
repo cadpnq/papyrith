@@ -200,10 +200,10 @@
       (jump *continue-label*)
       *break-label*)))
 
-(def-comparison-compiler compare-lt)
-(def-comparison-compiler compare-lte)
-(def-comparison-compiler compare-gt)
-(def-comparison-compiler compare-gte)
+(def-comparison-compiler <)
+(def-comparison-compiler <=)
+(def-comparison-compiler >)
+(def-comparison-compiler >=)
 
 (def-operator-compiler and (arg1 arg2 &optional dest)
   (let ((end-label (new-label))
