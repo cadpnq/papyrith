@@ -39,9 +39,9 @@
 
 (def-instructions
   ((integer-add iadd)
-   (integer-sub isub)
-   (integer-mul imul)
-   (integer-div idiv)
+   (integer-sub isubtract)
+   (integer-mul imultiply)
+   (integer-div idivide)
    (integer-mod imod))
   dest
   arg1
@@ -53,9 +53,9 @@
 
 (def-instructions
   ((float-add fadd)
-   (float-sub fsub)
-   (float-mul fmul)
-   (float-div fdiv))
+   (float-sub fsubtract)
+   (float-mul fmultiply)
+   (float-div fdivide))
   dest
   arg1
   arg2)
