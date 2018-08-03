@@ -153,6 +153,15 @@
             ((truthy-constant value) (replace-instruction (jump (instruction-target instruction)))))
       t)))
 
+;;; A CAST instruction where the dest and source are of the same type can be
+;;; turned into an ASSIGN instruction.
+(def-optimizer (cast-as)
+  (let ((dest (instruction-dest instruction))
+        (source (instruction-arg1 instruction)))
+    (when (type-match dest source)
+      (replace-instruction (assign dest source))
+      t)))
+
 (defun branches-to (target-label code)
   (loop for instruction in code
         when (equal target-label (instruction-target instruction))
