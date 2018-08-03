@@ -69,10 +69,10 @@
     (kill-instruction)
     t))
 
-;;; All code between a jump and the next label is dead and can be removed.
-;;; TODO: this also applies to the return instruction
-(def-optimizer (jump)
-  (unless (label-p (second code))
+;;; All code between a jump (and RETURN) and the next label is dead and can be removed.
+(def-optimizer (jump ret)
+  (unless (or (label-p (second code))
+              (not (second code)))
     (setf (rest code) (member-if #'label-p (rest code)))
     t))
 
