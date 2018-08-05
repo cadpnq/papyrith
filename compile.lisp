@@ -138,9 +138,9 @@
   (:float f+)
   (:int i+))
 
-(def-math-compiler sub)
-(def-math-compiler mul)
-(def-math-compiler div)
+(def-math-compiler sub -)
+(def-math-compiler mul *)
+(def-math-compiler div /)
 
 (def-simple-operator integer-mod (:int :int) :int integer-mod)
 
