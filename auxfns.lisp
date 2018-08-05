@@ -22,3 +22,6 @@
 (defun rest2 (x)
   "The rest of a list after the first TWO elements."
   (rest (rest x)))
+
+(defun make-keyword (name) (values (intern (string-upcase name) "KEYWORD")))
+
