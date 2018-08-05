@@ -220,11 +220,13 @@
     (if (or (falsy-constant arg1)
             (falsy-constant arg2))
       (emit (assign dest +false+))
-      (emit (cast-as comparison (compile-expression arg1 comparison))
-            (jump-f comparison end-label)
-            (cast-as comparison (compile-expression arg2 comparison))
-            end-label
-            (assign dest comparison))))
+      (if (eq arg1 arg2)
+        (emit (cast-as dest (compile-expression arg1)))
+        (emit (cast-as comparison (compile-expression arg1 comparison))
+              (jump-f comparison end-label)
+              (cast-as comparison (compile-expression arg2 comparison))
+              end-label
+              (assign dest comparison)))))
   dest)
 
 (def-operator-compiler || (arg1 arg2 &optional dest)
@@ -239,11 +241,13 @@
     (if (or (truthy-constant arg1)
             (truthy-constant arg2))
       (emit (assign dest +true+))
-      (emit (cast-as comparison (compile-expression arg1 comparison))
-            (jump-t comparison end-label)
-            (cast-as comparison (compile-expression arg2 comparison))
-            end-label
-            (assign dest comparison))))
+      (if (eq arg1 arg2)
+        (emit (cast-as dest (compile-expression arg1)))
+        (emit (cast-as comparison (compile-expression arg1 comparison))
+              (jump-t comparison end-label)
+              (cast-as comparison (compile-expression arg2 comparison))
+              end-label
+              (assign dest comparison)))))
   dest)
 
 (def-simple-operator ! (+any+) :bool logical-not)
