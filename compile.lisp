@@ -263,12 +263,13 @@
         (compile-expression value dest)))))
 
 (def-operator-compiler aref (array index &optional dest)
+  (setf array (compile-expression array))
   (unless (and dest (type-match dest
                                 (identifier-subtype array)))
     (setf dest (temp-identifier (identifier-subtype array))))
   (emit
     (array-get-element dest
-                       (compile-expression array)
+                       array
                        (compile-as index :int)))
   dest)
 
