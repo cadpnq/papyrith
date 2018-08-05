@@ -1,5 +1,7 @@
 ;;;; Define the instructions of the papyrus VM
 
+(in-package :papyrith)
+
 (defstruct instruction
   op asm target name dest arg1 arg2 arg3
   arg4 arg5 parameters)

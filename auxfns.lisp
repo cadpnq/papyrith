@@ -1,3 +1,5 @@
+(in-package :papyrith)
+
 ; from On Lisp
 (defun mkstr (&rest args)
    (with-output-to-string (s)

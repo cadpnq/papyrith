@@ -1,5 +1,7 @@
 ;;;; Peephole optimizer
 
+(in-package :papyrith)
+
 ;;; If this looks familiar then you've probably read PAIP. It is based on the
 ;;; optimizer from chapter 23.
 

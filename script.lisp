@@ -1,5 +1,7 @@
 ;;;; Structures for holding the different parts of a script.
 
+(in-package :papyrith)
+
 (defvar *script*)
 (defvar *object*)
 (defvar *state*)

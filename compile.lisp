@@ -1,3 +1,6 @@
+
+(in-package :papyrith)
+
 (defvar *bytecode*)
 (defmacro emit (&rest instructions)
   `(progn

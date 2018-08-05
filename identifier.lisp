@@ -1,3 +1,6 @@
+
+(in-package :papyrith)
+
 (defstruct (identifier
   (:include papyrus-type)
   (:print-function

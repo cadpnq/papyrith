@@ -1,3 +1,6 @@
+
+(in-package :papyrith)
+
 (defun previous (e l)
   (second (member e (reverse l))))
 

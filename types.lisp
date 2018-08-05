@@ -1,5 +1,7 @@
 ;;;; Papyrus data type information
 
+(in-package :papyrith)
+
 (defstruct (papyrus-type
   (:print-function
     (lambda (p s k)

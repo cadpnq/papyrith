@@ -1,3 +1,6 @@
+
+(in-package :papyrith)
+
 (let ((ir-loaders (make-hash-table)))
   (defun put-ir-loader (name loader)
     (setf (gethash name ir-loaders) loader))
