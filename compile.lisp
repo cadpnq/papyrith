@@ -55,23 +55,23 @@
                          (let ((compiler ',compiler))
                            (compile-expression `(,compiler ,arg1 ,arg2) dest))))))))
 
-(defmacro def-math-compiler (name)
+(defmacro def-math-compiler (name operator)
   (let ((integer-name (symb 'integer- name))
         (float-name (symb 'float- name)))
-    `(progn (def-simple-operator ,integer-name (:integer :integer) :integer ,integer-name)
+    `(progn (def-simple-operator ,integer-name (:int :int) :int ,integer-name)
             (def-simple-operator ,float-name (:float :float) :float ,float-name)
-            (def-dispatching-compiler ,name
+            (def-dispatching-compiler ,operator
                                       (:float ,float-name)
-                                      (:integer ,integer-name)))))
+                                      (:int ,integer-name)))))
 
 (defmacro def-comparison-compiler (name)
   (let ((integer-name (symb 'integer- name))
         (float-name (symb 'float- name)))
-    `(progn (def-simple-operator ,integer-name (:integer :integer) :bool ,integer-name)
+    `(progn (def-simple-operator ,integer-name (:int :int) :bool ,integer-name)
             (def-simple-operator ,float-name (:float :float) :bool ,float-name)
             (def-dispatching-compiler ,name
                                       (:float ,float-name)
-                                      (:integer ,integer-name)))))
+                                      (:int ,integer-name)))))
 
 (defun compile-expressions (code)
   (mapcar #'compile-expression code))
@@ -142,7 +142,7 @@
 (def-math-compiler mul)
 (def-math-compiler div)
 
-(def-simple-operator integer-mod (:integer :integer) :integer integer-mod)
+(def-simple-operator integer-mod (:int :int) :int integer-mod)
 
 (def-compiler assign (dest arg1)
   (let ((value (compile-expression arg1 dest)))
