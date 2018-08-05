@@ -59,7 +59,7 @@
   (static nil))
 
 (defstruct-printing papyrus-state
-  (if functions
+  (when functions
     (format s ".state ~A~%~
                ~{~A~%~}~
                .endState" name functions))
