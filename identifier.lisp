@@ -76,4 +76,6 @@
      parameter))
 
 (defun temp-identifier (type)
-  (papyrus-local (gensym (mkstr "::" type)) type))
+  (let ((temp (papyrus-local (gensym (mkstr "::" type)) type)))
+    (setf (identifier-scope temp) :temp)
+    temp))
