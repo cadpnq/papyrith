@@ -27,3 +27,8 @@
 
 (defun make-keyword (name) (values (intern (string-upcase name) "KEYWORD")))
 
+(defun indent (s)
+  (format nil "~{~2T~A~^~%~}" (lines (prin1-to-string s))))
+
+(defun indent-list (l)
+  (mapcar #'indent l))
