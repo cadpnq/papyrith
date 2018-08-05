@@ -13,7 +13,8 @@
 (defun load-ir (ir)
   (let ((loader (first ir))
         (arguments (rest ir)))
-    (apply (get-ir-loader loader) arguments)))
+    (when loader
+      (apply (get-ir-loader loader) arguments))))
 
 (def-ir-loader script (name-and-properties &rest body)
   (let* ((*script* (make-script))
