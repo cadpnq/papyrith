@@ -43,9 +43,11 @@
   (when *state*
     (destructuring-bind (name &key (userflags 0)
                                    (docstring "")
+                                   (static nil)
                                    (return-type :none)
                                    parameters) name-and-properties
       (let ((*function* (make-papyrus-function :name name
+                                               :static static
                                                :userflags userflags
                                                :docstring docstring)))
         (when return-type
