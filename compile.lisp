@@ -2,8 +2,11 @@
 (defmacro emit (&rest instructions)
   `(progn
     ,@(loop for instruction in instructions
-            collect `(when (instruction-p ,instruction)
-                      (push ,instruction (rest (last *bytecode*)))))))
+            collect `(emit-1 ,instruction))))
+
+(defun emit-1 (instruction)
+  (when (instruction-p instruction)
+    (push instruction (rest (last *bytecode*)))))
 
 (defun compile-papyrus (code)
   (let ((*bytecode* (list (list))))
