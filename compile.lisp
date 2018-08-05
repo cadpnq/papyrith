@@ -246,7 +246,7 @@
             (assign dest comparison))))
   dest)
 
-(def-simple-operator not (+any+) :bool logical-not)
+(def-simple-operator ! (+any+) :bool logical-not)
 
 (def-compiler dot (a b)
   (list 'dot a b))
