@@ -26,9 +26,10 @@
                                    (user "papyrith")
                                    (computer "")
                                    (userflags 0)
-                                   (docstring "")) name-and-properties
-      (setf (papyrus-object-name *object*)
-            name
+                                   (docstring "")
+                                   &allow-other-keys) name-and-properties
+      (setf (papyrus-object-name *object*) name
+            (papyrus-object-docstring *object*) docstring
             (script-info *script*)
             (make-info :source source
                        :modify-time modify-time
