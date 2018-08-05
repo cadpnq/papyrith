@@ -67,11 +67,11 @@
 
 (defstruct-printing info
   (format s ".info~%~
-             ~T.source ~S~%~
-             ~T.modifyTime ~A~%~
-             ~T.compileTime ~A~%~
-             ~T.user ~S~%~
-             ~T.computer ~S~%~
+             ~2T.source ~S~%~
+             ~2T.modifyTime ~A~%~
+             ~2T.compileTime ~A~%~
+             ~2T.user ~S~%~
+             ~2T.computer ~S~%~
              .endInfo"
     source
     modify-time
