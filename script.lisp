@@ -31,7 +31,7 @@
   (object-table (list (make-papyrus-object))))
 
 (defstruct-printing papyrus-function
-  (format s ".function ~A~%~
+  (format s ".function ~A ~:[~;static~]~%~
              .userFlags ~A~%~
              .docString ~S~%~
              .return ~A~%~
@@ -44,7 +44,7 @@
              .code~%~
              ~{~A~%~}~
              .endCode~%~
-             .endFunction" name userflags docstring return-type
+             .endFunction" name static userflags docstring return-type
                            (mapcar #'print-parameter-definition param-table)
                            (mapcar #'print-local-definition local-table)
                            (mapcar #'print-instruction code))
@@ -55,7 +55,8 @@
   (param-table (list))
   (local-table (list))
   code
-  ast)
+  ast
+  (static nil))
 
 (defstruct-printing papyrus-state
   (if functions
