@@ -113,13 +113,13 @@
        (when (and (numberp arg1)
                   (numberp arg2))
          (replace-instruction (assign (instruction-dest instruction)
-                                      (,operation arg1 arg2)))
+                                      (funcall ,operation arg1 arg2)))
          t))))
 
-(def-math-optimizer (integer-add float-add) +)
-(def-math-optimizer (integer-sub float-sub) -)
-(def-math-optimizer (integer-mul float-mul) *)
-(def-math-optimizer (integer-div float-div) /)
+(def-math-optimizer (integer-add float-add) #'+)
+(def-math-optimizer (integer-sub float-sub) #'-)
+(def-math-optimizer (integer-mul float-mul) #'*)
+(def-math-optimizer (integer-div float-div) #'/)
 
 ;;; Any instruction (except for function calls) where DEST is ::nonevar can be
 ;;; removed.
