@@ -56,7 +56,9 @@
 (defparameter *analyzers* (list))
 (defmacro def-analyzer (scopes &rest body)
   `(push (lambda (this bindings)
+           (declare (ignorable this bindings))
            (destructuring-bind (identifier instruction set) this
+             (declare (ignorable identifier instruction set))
              (when (member (identifier-scope identifier)
                     ',scopes)
                ,@body)))
@@ -146,19 +148,13 @@
           collect binding))
 
 (defun siblings (binding1 bindings)
-  (loop with (identifier1 instruction1 set1) = binding1
+  (loop with (identifier1 nil set1) = binding1
         for binding2 in bindings
         for (identifier2 instruction2 set2) in bindings
         unless (eq binding1 binding2)
           when (and (eq identifier1 identifier2)
                     (intersection set1 set2))
             collect binding2))
-
-(defun rewrite-binding (binding new)
-  (let ((old (first binding)))
-   (setf (first binding) new)
-   (setf (instruction-dest (second binding)) new)
-   (rewrite-instructions (third binding) old new)))
 
 (defun rewrite-arguments (instruction old new)
   (loop for slot in '(arg1 arg2 arg3 arg4 arg5)
@@ -169,3 +165,9 @@
 (defun rewrite-instructions (instructions old new)
   (loop for instruction in instructions
         do (rewrite-arguments instruction old new)))
+
+(defun rewrite-binding (binding new)
+  (let ((old (first binding)))
+   (setf (first binding) new)
+   (setf (instruction-dest (second binding)) new)
+   (rewrite-instructions (third binding) old new)))
