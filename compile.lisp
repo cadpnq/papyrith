@@ -208,7 +208,7 @@
 (def-comparison-compiler >)
 (def-comparison-compiler >=)
 
-(def-operator-compiler and (arg1 arg2 &optional dest)
+(def-operator-compiler && (arg1 arg2 &optional dest)
   (let ((end-label (new-label))
         (comparison (temp-identifier :bool)))
     (when (and dest
@@ -227,7 +227,7 @@
             (assign dest comparison))))
   dest)
 
-(def-operator-compiler or (arg1 arg2 &optional dest)
+(def-operator-compiler || (arg1 arg2 &optional dest)
   (let ((end-label (new-label))
         (comparison (temp-identifier :bool)))
     (when (and dest
