@@ -12,19 +12,20 @@
   (defun get-optimizers (name)
     (gethash name optimizers)))
 
-(defmacro def-optimizer (instructions &rest body)
-  `(progn
-    ,@(loop for instruction in instructions
-            collect `(put-optimizer ',instruction
-                      ,(make-optimizer body)))))
-
-(defun make-optimizer (body)
+(defmacro make-optimizer (body)
   `(lambda (instruction code all-code)
+    (declare (ignorable instruction code all-code))
     (macrolet ((kill-instruction ()
                 `(remove-instruction instruction all-code))
               (replace-instruction (new-instruction)
                 `(setf (first code) ,new-instruction)))
       ,@body)))
+
+(defmacro def-optimizer (instructions &rest body)
+  `(progn
+    ,@(loop for instruction in instructions
+            collect `(put-optimizer ',instruction
+                      (make-optimizer ,body)))))
 
 (defun remove-instruction (instruction code)
   (let* ((location (member instruction code))
