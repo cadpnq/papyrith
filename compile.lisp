@@ -150,6 +150,16 @@
       (emit (assign dest value))))
   dest)
 
+(def-operator-compiler == (a b &optional dest)
+  (setf a (compile-expression a)
+        b (compile-expression b))
+  (unless (type-match dest :bool)
+    (setf dest (temp-identifier :bool)))
+  (if (not (type-match a b))
+    nil ; TODO: error here
+    (emit (compare-eq dest a b)))
+  dest)
+
 (def-compiler if (&rest clauses)
   (let ((exit-label (new-label)))
     (loop for (antecedent . consequent) in clauses
