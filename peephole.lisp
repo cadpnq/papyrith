@@ -6,7 +6,7 @@
 (let ((optimizers (make-hash-table)))
   (defun put-optimizer (name optimizer)
     (unless (gethash name optimizers)
-      (setf (gethash name optimizers) '()))
+      (setf (gethash name optimizers) (list)))
     (push optimizer (gethash name optimizers)))
 
   (defun get-optimizers (name)
