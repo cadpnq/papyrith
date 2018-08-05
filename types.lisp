@@ -20,7 +20,10 @@
                                        :subtype (papyrus-type-subtype type)))
     (string +string+)
     (integer +int+)
-    (keyword (funcall constructor :type type))
+    (keyword (if (ends-with-p "[]" (princ-to-string type))
+               (funcall constructor :type :array
+                                    :subtype (make-keyword (symb (substring 0 -2 (princ-to-string type)))))
+               (funcall constructor :type type)))
     (list (funcall constructor :type (first type)
                                :subtype (second type)))))
 
